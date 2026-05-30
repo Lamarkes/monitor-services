@@ -20,7 +20,17 @@ services:
     networks: 
       - test_net
   
-  statusservice:
+  statusservice1:
+    build: ./status-service
+    networks:
+      - test_net
+  
+  statusservice2:
+    build: ./status-service
+    networks:
+      - test_net
+  
+  statusservice3:
     build: ./status-service
     networks:
       - test_net
