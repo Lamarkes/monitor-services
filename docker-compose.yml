@@ -4,23 +4,28 @@ networks:
     driver: bridge
 
 services:
+
+  nginx:
+    image: nginx
+    ports:
+      - "8085:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - test_net
+
+
   logservice:
     build: ./log-service
-    ports:
-      - "3003:3003"
     networks: 
       - test_net
   
   statusservice:
     build: ./status-service
-    ports:
-      - "3001:3001"
     networks:
       - test_net
 
   systeminfoservice:
     build: ./system-info-service
-    ports:
-      - "3002:3002"
     networks:
       - test_net
