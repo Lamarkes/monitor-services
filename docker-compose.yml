@@ -1,10 +1,24 @@
 
 networks:
-  test_net:
+  backend-net:
+    driver: bridge
+  database-net:
     driver: bridge
 
 services:
 
+  postgres:
+    image: postgres:17.10-alpine
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: admin
+      POSTGRES_DB: mydb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - database-net
+      
   nginx:
     image: nginx
     ports:
@@ -12,30 +26,38 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     networks:
-      - test_net
+      - backend-net
+    depends_on:
+      - statusservice1
+      - statusservice2
+      - statusservice3
 
 
   logservice:
     build: ./log-service
     networks: 
-      - test_net
+      - backend-net
+      - database-net
   
   statusservice1:
     build: ./status-service
     networks:
-      - test_net
+      - backend-net
   
   statusservice2:
     build: ./status-service
     networks:
-      - test_net
+      - backend-net
   
   statusservice3:
     build: ./status-service
     networks:
-      - test_net
+      - backend-net
 
   systeminfoservice:
     build: ./system-info-service
     networks:
-      - test_net
+      - backend-net
+
+volumes:
+  postgres_data:
