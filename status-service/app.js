@@ -22,18 +22,17 @@ app.get("/status", (req, res) => {
         "uptime": `${hours} hrs:${minutes} min:${seconds} sec`,
         "hostname": hostname
     });
-    sendLogs(date_time.toString());
+    sendLogs();
 });
 
 
 
-async function sendLogs(date_time) {
+async function sendLogs() {
 
     const response = { 
         'service': 'status-service', 
         "message": "GET /status executado",
         "route": "/status",
-        'date': date_time,
         "method": "GET",
         "hostname": hostname
     
