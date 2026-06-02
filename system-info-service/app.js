@@ -9,24 +9,22 @@ const mem = Math.floor(os.totalmem() / 1048576);
 const hostname = os.hostname();
 
 app.get('/system', (req, res) => {
-    const date_time = new Date();
     res.json({
         "plataform": plataform,
         "memory": mem + "MB",
         "hostname": hostname
 
     });
-    sendLogs(date_time.toString());
+    sendLogs();
 });
 
 
-async function sendLogs(date_time) {
+async function sendLogs() {
 
     const response = {
         'service': 'system-info-service',
         "message": "GET /system executado",
         "route": "/system",
-        'date': date_time,
         "method": "GET",
         "hostname": process.env.HOSTNAME
 
