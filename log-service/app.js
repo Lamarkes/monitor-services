@@ -15,7 +15,7 @@ const pool = new Pool({
 const queryCreateTable = `CREATE TABLE IF NOT EXISTS saved_logs (
                             id SERIAL PRIMARY KEY,
                             service_name VARCHAR(100) NOT NULL,
-                            message VARCHAR(100) NOT NULL,
+                            message TEXT NOT NULL,
                             route VARCHAR(100) NOT NULL,
                             method VARCHAR(30) NOT NULL,
                             hostname VARCHAR(100) NOT NULL,
@@ -34,30 +34,40 @@ const queryInsertTable = `INSERT INTO saved_logs(service_name, message, route, m
                             VALUES($1, $2, $3, $4, $5)`
 
 async function insertTableFunction(query, values) {
-    try {
-        const res = await pool.query(query, values);
-    } catch (error) {
-        console.log("Error to insert table", error.stack);
-    }
+
+    return await pool.query(query, values);
+    
 }
 
-createTableFunction();
-app.post('/log', (req, res) => {
-    const values = [
-        req.body.service,
-        req.body.message,
-        req.body.route,
-        req.body.method,
-        req.body.hostname
-    ];
-    insertTableFunction(queryInsertTable, values);
+app.post('/log', async (req, res) => {
 
-    res.json({ message: 'Log criado!' });
+    try {
+        const values = [
+            req.body.service,
+            req.body.message,
+            req.body.route,
+            req.body.method,
+            req.body.hostname
+        ];
+
+
+        const resp = await insertTableFunction(queryInsertTable, values);
+
+        if (resp.rowCount > 0) {
+            res.json({ message: 'Log criado!' });
+        } else {
+            res.status(500).json({ error: 'Erro ao inserir dados!' })
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao inserir dados!' })
+    }
+
 });
 
 app.get('/logs', async (req, res) => {
 
-    const response = await pool.query("SELECT * FROM saved_logs");
+    const selectQuery = "SELECT * FROM saved_logs ORDER BY created_at DESC"
+    const response = await pool.query(selectQuery);
 
     res.json(response.rows);
 });
@@ -65,7 +75,11 @@ app.get('/logs', async (req, res) => {
 
 const PORT = process.env.PORT || 3003;
 
+async function startServer() {
+    await createTableFunction();
 
-app.listen(PORT, () => {
-    console.log(`Running PORT: ${PORT}`);
-})
+    app.listen(PORT, () => {
+        console.log(`Running PORT: ${PORT}`);
+    })
+}
+startServer();
