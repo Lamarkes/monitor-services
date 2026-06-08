@@ -36,7 +36,7 @@ const queryInsertTable = `INSERT INTO saved_logs(service_name, message, route, m
 async function insertTableFunction(query, values) {
 
     return await pool.query(query, values);
-    
+
 }
 
 app.post('/log', async (req, res) => {
@@ -72,6 +72,21 @@ app.get('/logs', async (req, res) => {
     res.json(response.rows);
 });
 
+app.get('/health', async (req, res) => {
+
+    try {
+        await pool.query("SELECT NOW()");
+        res.json({
+        "service": "log-service",
+        "status": "UP"
+    });
+    }catch(error){
+        res.status(503).json({
+            service: "log-service",
+            status: "DOWN"
+        });
+    }
+});
 
 const PORT = process.env.PORT || 3003;
 
