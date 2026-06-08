@@ -25,6 +25,13 @@ app.get("/status", (req, res) => {
     sendLogs();
 });
 
+app.get('/health', (req, res)=>{
+
+    res.json({
+        "service": "status-service",
+        "status": "UP"
+    })
+});
 
 
 async function sendLogs() {
@@ -50,7 +57,6 @@ async function sendLogs() {
     }
     
 }
-
 
 const PORT = process.env.PORT || 3001;
 
