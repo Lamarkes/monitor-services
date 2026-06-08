@@ -18,6 +18,13 @@ app.get('/system', (req, res) => {
     sendLogs();
 });
 
+app.get('/health', (req, res)=>{
+
+    res.json({
+        "service": "system-info-service",
+        "status": "UP"
+    });
+});
 
 async function sendLogs() {
 
